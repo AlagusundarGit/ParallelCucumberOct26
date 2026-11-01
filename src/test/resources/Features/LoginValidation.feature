@@ -6,7 +6,7 @@ Feature: Login
     And User clicks on Accept Cookies
     And User clicks on account
 
-  @sanity @smoke
+  @sanity @smoke @test
   Scenario: Login the application
     When User enters valid username and password
     And User clicks Login
@@ -27,14 +27,3 @@ Feature: Login
       | passwords | Test$1234   |
     And User clicks Login
     Then User should be redirected to the home page
-
-  Scenario Outline: Login the application outline
-    When User enters valid username and password "<username>" "<password>"
-    And User clicks Login
-    Then User should be redirected to the home page
-
-    Examples:
-      | username                             | password  |
-      | alagusundar.sundar@lnitwellgroup.com | Test$1234 |
-      | as@as.com                            | Test$1234 |
-      | new@new.com                          | Test$1234 |

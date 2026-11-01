@@ -7,11 +7,12 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 import com.lb.resources.CommonActions;
+import com.lb.resources.DriverManager;
 
 public class CartPage extends CommonActions{
 
 	public CartPage() {
-		PageFactory.initElements(driver, this);
+		PageFactory.initElements(DriverManager.getDriver(), this);
 	}
 	
 	@FindBy(xpath = "(//p[contains(@class,'product-name')])[1]")

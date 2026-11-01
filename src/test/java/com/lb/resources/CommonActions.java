@@ -32,7 +32,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.Allure;
 
 public class CommonActions {
-	public static WebDriver driver;
+	
 	public static WebDriverWait wait;
 	
 	//Read config properties
@@ -63,11 +63,11 @@ public class CommonActions {
 		}
 		// options.addArguments("--start-maximized");
 		options.addArguments("--window-size=1920,1080");
-		driver = new ChromeDriver(options);
+		DriverManager.setDriver(new ChromeDriver(options));
 		int timeout=Integer.parseInt(getProperty("explicitWait"));
-		wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
-		// driver.manage().window().maximize();
-		driver.get(getProperty("url"));
+		wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeout));
+		DriverManager.getDriver().manage().window().maximize();
+		DriverManager.getDriver().get(getProperty("url"));
 	}
 
 	public void printValue(WebElement element) {
@@ -98,12 +98,12 @@ public class CommonActions {
 
 	// scroll to element
 	public void scrollToElement(WebElement element) {
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+		((JavascriptExecutor) DriverManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
 	}
 
 	// hover
 	public void hover(WebElement element) {
-		Actions action = new Actions(driver);
+		Actions action = new Actions(DriverManager.getDriver());
 		action.moveToElement(element).pause(Duration.ofSeconds(2)).perform();
 	}
 
@@ -124,11 +124,11 @@ public class CommonActions {
 
 	// window handle
 	public void windowHandle() throws InterruptedException {
-		String parentURL = driver.getWindowHandle();
-		Set<String> childURL = driver.getWindowHandles();
+		String parentURL = DriverManager.getDriver().getWindowHandle();
+		Set<String> childURL = DriverManager.getDriver().getWindowHandles();
 		for (String child : childURL) {
 			if (!parentURL.equals(child)) {
-				driver.switchTo().window(child);
+				DriverManager.getDriver().switchTo().window(child);
 			}
 		}
 		Thread.sleep(2000);
@@ -137,7 +137,7 @@ public class CommonActions {
 	// highlighter
 	public void highlightElement(WebElement element) {
 		waitForElementVisible(element);
-		JavascriptExecutor js = (JavascriptExecutor) driver;
+		JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
 		js.executeScript("arguments[0].style.backgroundColor='yellow';" + "arguments[0].style.border='3px solid red';",
 				element);
 		try {
@@ -149,14 +149,14 @@ public class CommonActions {
 
 	// Actions
 	public void moveToElemant(WebElement element) {
-		Actions a = new Actions(driver);
+		Actions a = new Actions(DriverManager.getDriver());
 		a.moveToElement(element).perform();
 		;
 	}
 
 	// Actions build() inside in perform() in Selenium 4
 	public void dragAndDrop(WebElement source, WebElement target) {
-		Actions a = new Actions(driver);
+		Actions a = new Actions(DriverManager.getDriver());
 		a.dragAndDrop(source, target).build().perform();
 	}
 

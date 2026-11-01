@@ -5,11 +5,12 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 import com.lb.resources.CommonActions;
+import com.lb.resources.DriverManager;
 
 public class HomePage extends CommonActions{
 
 	public HomePage() {
-		PageFactory.initElements(driver, this);
+		PageFactory.initElements(DriverManager.getDriver(), this);
 	}
 	
 	@FindBy(xpath = "//div[@class='header container']//a[@id='cat10016']")
