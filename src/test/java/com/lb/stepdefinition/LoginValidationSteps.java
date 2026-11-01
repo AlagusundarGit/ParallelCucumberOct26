@@ -48,7 +48,6 @@ public class LoginValidationSteps extends CommonActions {
 	public void user_clicks_on_accept_cookies() {
 		// WebElement
 		// shipToUs=driver.findElement(By.xpath("//button[@id='esw-ship-to-us']"));
-		ca.waitForClickable(l.getShipToUS());
 		ca.clickCookies(l.getShipToUS());
 	}
 
