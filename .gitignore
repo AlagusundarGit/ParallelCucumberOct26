@@ -1,0 +1,14 @@
+# Allure
+allure-results/
+allure-report/
+
+# Maven
+target/
+
+# Excel
+Excel/
+
+# Eclipse
+.project
+.classpath
+.settings/
