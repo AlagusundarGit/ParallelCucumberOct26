@@ -33,8 +33,6 @@ import io.qameta.allure.Allure;
 
 public class CommonActions {
 	
-	public static WebDriverWait wait;
-	
 	//Read config properties
 	public String getProperty(String key) {
 	    Properties prop = new Properties();
@@ -51,26 +49,47 @@ public class CommonActions {
 	public void driverLaunch() {
 
 		try {
-			FileUtils.deleteDirectory(new File("allure-results"));
+			//FileUtils.deleteDirectory(new File("allure-results"));
 		} catch (Exception e) {
 		}
 
-		WebDriverManager.chromedriver().setup();
-
 		ChromeOptions options = new ChromeOptions();
-		if(getProperty("headless").equalsIgnoreCase("true")) {
-		options.addArguments("--headless=new");
+		
+		if (getProperty("headless").equalsIgnoreCase("true")) {
+		    options.addArguments("--headless=new");
+		    options.addArguments("--window-size=1920,1080");
+		    DriverManager.setDriver(new ChromeDriver(options));
+		} else {
+		    DriverManager.setDriver(new ChromeDriver(options));
+		    DriverManager.getDriver().manage().window().maximize();
 		}
-		// options.addArguments("--start-maximized");
-		options.addArguments("--window-size=1920,1080");
-		DriverManager.setDriver(new ChromeDriver(options));
+		
 		int timeout=Integer.parseInt(getProperty("explicitWait"));
-		wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeout));
-		DriverManager.getDriver().manage().window().maximize();
+		DriverManager.setWait(new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeout)));
 		DriverManager.getDriver().get(getProperty("url"));
 	}
 
+	public void clickCookies(WebElement element) {
+	    try {
+	        if (element.isDisplayed()) {
+	            highlightElement(element);
+	            element.click();
+	        }
+	    } catch (Exception e) {
+	        System.out.println("Cookie popup not displayed");
+	    }
+	}
+	
+	public void waitForVisible(WebElement element) {
+	    DriverManager.getWait().until(ExpectedConditions.visibilityOf(element));
+	}
+
+	public void waitForClickable(WebElement element) {
+	    DriverManager.getWait().until(ExpectedConditions.elementToBeClickable(element));
+	}
+	
 	public void printValue(WebElement element) {
+		waitForVisible(element);
 		String value = element.getText();
 		System.out.println(value);
 		Allure.step("Verified value: " + value);
@@ -78,32 +97,43 @@ public class CommonActions {
 
 	// sendkeys
 	public void insertText(WebElement element, String input) {
+		waitForVisible(element);
+		highlightElement(element);
 		element.sendKeys(input);
 	}
 
 	// sendkeys and enter
 	public void insertTextEnter(WebElement element, String input) {
+		waitForVisible(element);
+		highlightElement(element);
 		element.sendKeys(input, Keys.ENTER);
 	}
 
 	// click
 	public void button(WebElement element) {
+		waitForClickable(element);
+		highlightElement(element);
 		element.click();
 	}
 
 	// get Text
 	public void getText(WebElement element) {
+		waitForVisible(element);
+		highlightElement(element);
 		System.out.println(element.getText());
 	}
 
 	// scroll to element
 	public void scrollToElement(WebElement element) {
+		waitForVisible(element);
+		highlightElement(element);
 		((JavascriptExecutor) DriverManager.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
 	}
 
 	// hover
 	public void hover(WebElement element) {
 		Actions action = new Actions(DriverManager.getDriver());
+		highlightElement(element);
 		action.moveToElement(element).pause(Duration.ofSeconds(2)).perform();
 	}
 
@@ -115,6 +145,7 @@ public class CommonActions {
 
 			if (size.isDisplayed() && size.isEnabled()) {
 				scrollToElement(size);
+				waitForClickable(size);
 				highlightElement(size);
 				size.click();
 				break;
@@ -136,7 +167,7 @@ public class CommonActions {
 
 	// highlighter
 	public void highlightElement(WebElement element) {
-		waitForElementVisible(element);
+		waitForVisible(element);
 		JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
 		js.executeScript("arguments[0].style.backgroundColor='yellow';" + "arguments[0].style.border='3px solid red';",
 				element);
@@ -150,6 +181,8 @@ public class CommonActions {
 	// Actions
 	public void moveToElemant(WebElement element) {
 		Actions a = new Actions(DriverManager.getDriver());
+		waitForVisible(element);
+		highlightElement(element);
 		a.moveToElement(element).perform();
 		;
 	}
@@ -158,11 +191,6 @@ public class CommonActions {
 	public void dragAndDrop(WebElement source, WebElement target) {
 		Actions a = new Actions(DriverManager.getDriver());
 		a.dragAndDrop(source, target).build().perform();
-	}
-
-	// wait
-	public void waitForElementVisible(WebElement element) {
-		wait.until(ExpectedConditions.visibilityOf(element));
 	}
 
 	// Excel read and write
@@ -174,7 +202,7 @@ public class CommonActions {
 		XSSFWorkbook w = new XSSFWorkbook();
 		XSSFSheet sheet = w.createSheet("Account Details");
 
-		List<WebElement> accountDetails = wait.until(
+		List<WebElement> accountDetails = DriverManager.getWait().until(
 				ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath("//div[@class='column-secondary']//li")));
 		for (int i = 0; i < accountDetails.size(); i++) {
 			WebElement detail = accountDetails.get(i);
