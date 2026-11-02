@@ -2,7 +2,7 @@
 
 <suite name="Cucumber Suite"
 	parallel="methods"
-	thread-count="4">
+	thread-count="2">
 
 	<test name="Regression Tests">
 
